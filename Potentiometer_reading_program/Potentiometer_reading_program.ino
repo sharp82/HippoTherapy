@@ -10,6 +10,7 @@ int MotorLocation3 = 0;
 int GoTo1 = 25;
 int GoTo2 = 25;
 int GoTo3 = 0;
+float GoToTest = 0.0;
 
 
 
@@ -37,7 +38,7 @@ float rangeScaleAsPerGraph = 12.0; //12 degrees
 int   potTolerance = 2;
 
 
-
+float pitchMotions[25] = { 9.025546063, 14.04062945, 15.84375291, 15.74362591, 15.04257653, 12.0354366, 8.021994481, 4.00855236, 1.802930987, 0.200236054, 2.003359513, 8.021994481, 12.0354366, 14.44146755, 15.04257653, 15.64349303, 12.43659253, 8.021994481, 2.003359513, 1.502323911, 1.001412434,0,0.400495935,4.00855236,8.222707243 };
 
 void setup() {
   // put your setup code here, to run once:
@@ -69,25 +70,27 @@ void loop() {
   MotorLocation1 = rangeOfLinearMotor / 1023 * pot1_startReading;
   MotorLocation2 = rangeOfLinearMotor / 1023 * pot2_startReading;
   MotorLocation3 = rangeOfLinearMotor / 1023 * pot3_startReading;
+for (int i = 0; i < 25 ; i++) {
+  GoToTest = pitchMotions[i];
 
-
-  while (GoTo2 < MotorLocation1) {
+  while (GoToTest < MotorLocation1) {
     analogWrite(en_2, dutyCycle);
     digitalWrite(in_2_1, LOW); // sets the 1st input of the motor 1 to LOW
     digitalWrite(in_2_2, HIGH); //sets the 2nd input of the motor 1 to HIGH
     delay(3);
   }
 
-  while (GoTo2 > MotorLocation1) {
+  while (GoToTest > MotorLocation1) {
     analogWrite(en_2, dutyCycle);
     digitalWrite(in_2_1, HIGH); // sets the 1st input of the motor 1 to HIGH
     digitalWrite(in_2_2, LOW); //sets the 2nd input of the motor 1 to LOW
 
     delay(3);
   }
-  while (GoTo2 = MotorLocation1) {
+  while (GoToTest = MotorLocation1) {
     delay(5);
   }
+}
 
   /*
     Serial.println("pot 1");
