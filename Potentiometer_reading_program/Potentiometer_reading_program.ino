@@ -71,20 +71,22 @@ void loop() {
   MotorLocation3 = rangeOfLinearMotor / 1023 * pot3_startReading;
 for (int i = 0; i < 25 ; i++) {
   GoToTest = pitchMotions[i];
-
-  while (GoToTest < MotorLocation1) {
-    analogWrite(en_2, dutyCycle);
-    digitalWrite(in_2_1, LOW); // sets the 1st input of the motor 1 to LOW
-    digitalWrite(in_2_2, HIGH); //sets the 2nd input of the motor 1 to HIGH
-    delay(3);
+  if (GoToTest < MotorLocation1) {
+    while (GoToTest < MotorLocation1) {
+      analogWrite(en_2, dutyCycle);
+      digitalWrite(in_2_1, LOW); // sets the 1st input of the motor 1 to LOW
+      digitalWrite(in_2_2, HIGH); //sets the 2nd input of the motor 1 to HIGH
+      delay(3);
+    }
   }
+  if (GoToTest > MotorLocation1) {
+    while (GoToTest > MotorLocation1) {
+      analogWrite(en_2, dutyCycle);
+      digitalWrite(in_2_1, HIGH); // sets the 1st input of the pitch moto nto HIGH
+      digitalWrite(in_2_2, LOW); //sets the 2nd input of the motor 1 to LOW
 
-  while (GoToTest > MotorLocation1) {
-    analogWrite(en_2, dutyCycle);
-    digitalWrite(in_2_1, HIGH); // sets the 1st input of the motor 1 to HIGH
-    digitalWrite(in_2_2, LOW); //sets the 2nd input of the motor 1 to LOW
-
-    delay(3);
+      delay(3);
+    }
   }
   while (GoToTest = MotorLocation1) {
     delay(5);
