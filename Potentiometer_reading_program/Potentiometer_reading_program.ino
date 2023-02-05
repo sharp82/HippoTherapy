@@ -4,6 +4,7 @@ int pot_out1 = A1;      // Analog,IN, Potentiometer For Motor 1 read pin
 int pot_out2 = A0;      // Analog,IN, Potentiometer For Motor 2 read pin
 int pot_out3 = A3;      // Analog,IN, Potentiometer For Motor 3 read pin
 float rangeOfLinearMotor = 50.0; //50 mm
+int rangeTest = 50;
 int MotorLocation1 = 0;
 int MotorLocation2 = 0;
 int MotorLocation3 = 0;
@@ -18,11 +19,11 @@ float GoToTest = 0.0;
 
 
 //OLD HIPPOTHERAPY CODE
-int en_1 = 9;          //Duty Cycle Out Pin for Motor 1[PWM signal] -> roll
-int en_2 = 10;         //Duty Cycle Out Pin for Motor 2[PWM signal] -> pitch
+int en_pitch = 9;          //Duty Cycle Out Pin for Motor 1[PWM signal] -> pitch
+int en_2 = 10;         //Duty Cycle Out Pin for Motor 2[PWM signal] -> roll
 int en_3 = 11;         //Duty Cycle Out Pin for Motor 3[PWM Signal] -> yaw
-int in_1_1 = 2;        // Direction Control Out 1 for Motor1 -> roll
-int in_1_2 = 3;        // Direction Control Out 2 for Motor1
+int in_pitch_1 = 2;        // Direction Control Out 1 for Motor1 -> pitch
+int in_pitch_2 = 3;        // Direction Control Out 2 for Motor1
 int in_2_1 = 4;        // Direction Control Out 1 for Motor2
 int in_2_2 = 5;        // Direction Control Out 2 for Motor2
 int in_3_1 = 6;        // Direction Control Out 1 for Motor3
@@ -36,7 +37,7 @@ int g_positionValue3 = 0;  // Initialization of Motor 3 to 0(position tracker)
 float maxSpeedOfLinearMotor = 150.0; //150mm/sec
 float rangeScaleAsPerGraph = 12.0; //12 degrees
 int   potTolerance = 2;
-/adding this line as an example
+//adding this line as an example
 float pitchMotions[25] = { 9.025546063, 14.04062945, 15.84375291, 15.74362591, 15.04257653, 12.0354366, 8.021994481, 4.00855236, 1.802930987, 0.200236054, 2.003359513, 8.021994481, 12.0354366, 14.44146755, 15.04257653, 15.64349303, 12.43659253, 8.021994481, 2.003359513, 1.502323911, 1.001412434,0,0.400495935,4.00855236,8.222707243 };
 
 void setup() {
@@ -46,9 +47,9 @@ void setup() {
   pinMode(pot_out1, INPUT); //setting the analog pin mode for the potentiometer as input
   pinMode(pot_out3, INPUT); //setting the analog pin mode for the potentiometer as input
 
-  pinMode(in_1_1, OUTPUT); //setting the pin of 1_1 as output for motor 1[input pin for motor 1]
-  pinMode(in_1_2, OUTPUT); //setting the pin of 1_2 as output for motor 1[input pin for motor 1]
-  pinMode(en_1, OUTPUT);   //setting the pin of the enable pin as output for motor 1
+  pinMode(in_pitch_1, OUTPUT); //setting the pin of 1_1 as output for motor 1[input pin for motor 1]
+  pinMode(in_pitch_2, OUTPUT); //setting the pin of 1_2 as output for motor 1[input pin for motor 1]
+  pinMode(en_pitch, OUTPUT);   //setting the pin of the enable pin as output for motor 1
 
   pinMode(in_2_1, OUTPUT); //setting the pin of 2_1 as output for motor 2[input pin for motor 2]
   pinMode(in_2_2, OUTPUT); //setting the pin of 2_2 as output for motor 2[2nd input pin for motor 2]
@@ -63,35 +64,58 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  int pot1_startReading = analogRead(pot_out1); //reads the potentiometer start value for motor 1 as Analog
+  float pot1_startReading = analogRead(pot_out1); //reads the potentiometer start value for motor 1 as Analog
   int pot2_startReading = analogRead(pot_out2); //reads the potentiometer start value for motor 2 as Analog
   int pot3_startReading = analogRead(pot_out3); //reads the potentiometer start value for motor 3 as Analog
+  //Serial.println(pot1_startReading,4);
   MotorLocation1 = rangeOfLinearMotor / 1023 * pot1_startReading;
   MotorLocation2 = rangeOfLinearMotor / 1023 * pot2_startReading;
   MotorLocation3 = rangeOfLinearMotor / 1023 * pot3_startReading;
-for (int i = 0; i < 25 ; i++) {
-  GoToTest = pitchMotions[i];
-  if (GoToTest < MotorLocation1) {
-    while (GoToTest < MotorLocation1) {
-      analogWrite(en_2, dutyCycle);
-      digitalWrite(in_2_1, LOW); // sets the 1st input of the motor 1 to LOW
-      digitalWrite(in_2_2, HIGH); //sets the 2nd input of the motor 1 to HIGH
-      delay(3);
+  //MotorLocation1 = rangeTest / 1023 * pot1_startReading; 
+  // Serial.println(MotorLocation1);
+  int j = 0;
+  for (int i = 0; i < 26 ; i++) {
+    if (j <= 10 && i > 25) {
+      i = 0;
+      j++;
+      Serial.write("starting over");
+    }
+    Serial.write(i);
+    GoToTest = pitchMotions[i];
+    Serial.println(GoToTest);
+  //GoToTest = 25.0;
+    if (GoToTest < MotorLocation1) {
+      //Serial.println(MotorLocation1);
+      //Serial.write("Less Than");
+      while (GoToTest < MotorLocation1) {
+        analogWrite(en_pitch, dutyCycle);
+        digitalWrite(in_pitch_1, LOW); // sets the 1st input of the motor 1 to LOW
+        digitalWrite(in_pitch_2, HIGH); //sets the 2nd input of the motor 1 to HIGH
+        pot1_startReading = analogRead(pot_out1);
+        MotorLocation1 = rangeOfLinearMotor / 1023 * pot1_startReading;
+        delay(3);
+      //Serial.println(MotorLocation1);
+      }
+    }
+    if (GoToTest > MotorLocation1) {
+    //Serial.write(MotorLocation1);
+    //Serial.write("greater than");
+      while (GoToTest > MotorLocation1) {
+        analogWrite(en_pitch, dutyCycle);
+        digitalWrite(in_pitch_1, HIGH); // sets the 1st input of the pitch moto nto HIGH
+        digitalWrite(in_pitch_2, LOW); //sets the 2nd input of the motor 1 to LOW
+        pot1_startReading = analogRead(pot_out1);
+        MotorLocation1 = rangeOfLinearMotor / 1023 * pot1_startReading;
+        //Serial.println(MotorLocation1);
+        delay(3);
+      }
+    }
+    while (GoToTest = MotorLocation1) {
+     //Serial.write("equal to");
+      delay(5);
+      //Serial.println(MotorLocation1);
     }
   }
-  if (GoToTest > MotorLocation1) {
-    while (GoToTest > MotorLocation1) {
-      analogWrite(en_2, dutyCycle);
-      digitalWrite(in_2_1, HIGH); // sets the 1st input of the pitch moto nto HIGH
-      digitalWrite(in_2_2, LOW); //sets the 2nd input of the motor 1 to LOW
-
-      delay(3);
-    }
-  }
-  while (GoToTest = MotorLocation1) {
-    delay(5);
-  }
-}
 
   /*
     Serial.println("pot 1");
